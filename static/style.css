@@ -1,49 +1,32 @@
-:root {
-  /* Default theme variables (can be overridden by user themes) */
-  --oai-bg-color: #f8f8f8;
-  --oai-border-color: #e0e0e0;
-  --oai-text-color: #333;
-  --oai-btn-bg: #6366f1;
-  --oai-btn-text: #fff;
-  --oai-btn-hover-bg: #4f46e5;
-  --oai-border-radius: 8px;
-}
-
-/* Nord Theme specific variables (will be used if Nord theme is active) */
-.theme-nord :root {
-  --oai-bg-color: #2e3440;
-  --oai-border-color: #434c5e;
-  --oai-text-color: #d8dee9;
-  --oai-btn-bg: #5e81ac;
-  --oai-btn-text: #e5e9f0;
-  --oai-btn-hover-bg: #81a1c1;
-}
-
 .oai-summary-wrap {
-  background: var(--oai-bg-color, #f8f8f8);
+  background: transparent;
+  background-color: rgba(127, 127, 127, 0.06);
+  background-color: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
   padding: 1.2em;
   margin-bottom: 1.5em;
-  border: 1px solid var(--oai-border-color, #e0e0e0);
-  border-radius: var(--oai-border-radius, 8px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(127, 127, 127, 0.22);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .oai-summary-btn {
+  display: block;
   font-size: 1.1em;
   padding: 0.5em 1em;
-  margin-bottom: 0.8em;
-  background-color: var(--oai-btn-bg, #6366f1);
-  color: var(--oai-btn-text, #fff);
+  margin: 0 auto 0.8em;
+  background-color: #6366f1;
+  color: #fff;
   border: none;
-  border-radius: var(--oai-border-radius, 6px);
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-weight: 500;
 }
 
 .oai-summary-btn:hover {
-  background-color: var(--oai-btn-hover-bg, #4f46e5);
+  background-color: #4f46e5;
 }
 
 .oai-summary-btn:disabled {
@@ -52,7 +35,7 @@
 }
 
 .oai-summary-content {
-  color: var(--oai-text-color, #333);
+  color: inherit;
   line-height: 1.6;
 }
 
@@ -65,7 +48,7 @@
   margin-top: 1em;
   margin-bottom: 0.5em;
   font-weight: 600;
-  color: var(--oai-text-color, #333);
+  color: inherit;
 }
 
 .oai-summary-content h1 {
