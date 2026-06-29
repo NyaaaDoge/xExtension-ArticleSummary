@@ -13,7 +13,10 @@ return array(
         'gemini' => 'Gemini'
     ),
     'button' => array(
-        'summarize' => '总结'
+        'summarize' => 'AI总结'
+    ),
+    'meta' => array(
+        'word_count' => '全文约 %s 字'
     ),
     'status' => array(
         'loading' => '加载中...',

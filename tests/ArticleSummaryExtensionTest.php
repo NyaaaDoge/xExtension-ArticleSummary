@@ -14,6 +14,33 @@ require_once __DIR__ . '/../phpstan-bootstrap.php';
 // 加载主要的类文件
 require_once __DIR__ . '/../extension.php';
 
+class TestArticleSummaryEntry extends \FreshRSS_Entry
+{
+    private string $id;
+    private string $content;
+
+    public function __construct(string $id, string $content)
+    {
+        $this->id = $id;
+        $this->content = $content;
+    }
+
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    public function content(): string
+    {
+        return $this->content;
+    }
+
+    public function _content(string $content): void
+    {
+        $this->content = $content;
+    }
+}
+
 /**
  * Test class for ArticleSummaryExtension
  * ArticleSummaryExtension 测试类
@@ -74,5 +101,25 @@ class ArticleSummaryExtensionTest extends TestCase
     public function testHandleConfigureActionMethodExists(): void
     {
         $this->assertTrue(method_exists('ArticleSummaryExtension', 'handleConfigureAction'));
+    }
+
+    public function testAddSummaryButtonRendersCenteredHeaderAndVisibleTextCount(): void
+    {
+        $extension = new \ArticleSummaryExtension();
+        $entry = new TestArticleSummaryEntry('entry-1', '<p>Hello <strong>世界</strong>&nbsp;!</p>');
+
+        $result = $extension->addSummaryButton($entry);
+        $content = $result->content();
+
+        $this->assertStringContainsString('class="oai-summary-header"', $content);
+        $this->assertStringContainsString('class="oai-summary-meta"', $content);
+        $this->assertStringContainsString('全文约 8 字', $content);
+    }
+
+    public function testChineseSummaryButtonLabelIsAiSummary(): void
+    {
+        $translations = require __DIR__ . '/../i18n/zh-CN/ArticleSummary.php';
+
+        $this->assertSame('AI总结', $translations['button']['summarize']);
     }
 }

@@ -73,6 +73,9 @@ final class ArticleSummaryExtension extends Minz_Extension
       )
     ));
 
+    $entryContent = $entry->content();
+    $wordCountText = $this->formatWordCount($this->countVisibleCharacters($entryContent));
+
     // Get translated texts
     // 获取翻译文本
     $summarizeText = _t('ArticleSummary.button.summarize');
@@ -84,18 +87,56 @@ final class ArticleSummaryExtension extends Minz_Extension
     // 向文章内容添加总结按钮和容器，并将翻译文本作为data属性
     $entry->_content(
       '<div class="oai-summary-wrap">'
-      . '<button data-request="' . $url_summary . '" '
-      . 'data-summarize-text="' . $summarizeText . '" '
-      . 'data-loading-text="' . $loadingText . '" '
-      . 'data-error-text="' . $errorText . '" '
-      . 'data-request-failed-text="' . $requestFailedText . '" '
-      . 'class="oai-summary-btn">' . $summarizeText . '</button>'
+      . '<div class="oai-summary-header">'
+      . '<button data-request="' . htmlspecialchars($url_summary, ENT_QUOTES, 'UTF-8') . '" '
+      . 'data-summarize-text="' . htmlspecialchars($summarizeText, ENT_QUOTES, 'UTF-8') . '" '
+      . 'data-loading-text="' . htmlspecialchars($loadingText, ENT_QUOTES, 'UTF-8') . '" '
+      . 'data-error-text="' . htmlspecialchars($errorText, ENT_QUOTES, 'UTF-8') . '" '
+      . 'data-request-failed-text="' . htmlspecialchars($requestFailedText, ENT_QUOTES, 'UTF-8') . '" '
+      . 'class="btn btn-important oai-summary-btn">' . htmlspecialchars($summarizeText, ENT_QUOTES, 'UTF-8') . '</button>'
+      . '<span class="oai-summary-meta">' . htmlspecialchars($wordCountText, ENT_QUOTES, 'UTF-8') . '</span>'
+      . '</div>'
       . '<div class="oai-summary-content"></div>'
       . '</div>'
-      . $entry->content()
+      . $entryContent
     );
     
     return $entry;
+  }
+
+  private function countVisibleCharacters(string $content): int
+  {
+    $text = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $content);
+    if (!is_string($text)) {
+      $text = $content;
+    }
+
+    $text = strip_tags($text);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $normalizedText = preg_replace('/\s+/u', '', trim($text));
+    if (is_string($normalizedText)) {
+      $text = $normalizedText;
+    }
+
+    if (function_exists('mb_strlen')) {
+      return mb_strlen($text, 'UTF-8');
+    }
+
+    if (preg_match_all('/./us', $text, $matches) === false) {
+      return strlen($text);
+    }
+
+    return count($matches[0]);
+  }
+
+  private function formatWordCount(int $wordCount): string
+  {
+    $template = _t('ArticleSummary.meta.word_count');
+    if ($template === 'ArticleSummary.meta.word_count' || $template === '') {
+      $template = '全文约 %s 字';
+    }
+
+    return sprintf($template, number_format($wordCount));
   }
 
   /**

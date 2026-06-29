@@ -13,7 +13,10 @@ return array(
         'gemini' => 'Gemini'
     ),
     'button' => array(
-        'summarize' => 'Summarize'
+        'summarize' => 'AI Summary'
+    ),
+    'meta' => array(
+        'word_count' => 'About %s characters'
     ),
     'status' => array(
         'loading' => 'Loading...',
