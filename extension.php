@@ -75,6 +75,7 @@ final class ArticleSummaryExtension extends Minz_Extension
 
     $entryContent = $entry->content();
     $wordCountText = $this->formatWordCount($this->countVisibleCharacters($entryContent));
+    $requestUrl = html_entity_decode($url_summary, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
     // Get translated texts
     // 获取翻译文本
@@ -88,7 +89,7 @@ final class ArticleSummaryExtension extends Minz_Extension
     $entry->_content(
       '<div class="oai-summary-wrap">'
       . '<div class="oai-summary-header">'
-      . '<button data-request="' . htmlspecialchars($url_summary, ENT_QUOTES, 'UTF-8') . '" '
+      . '<button data-request="' . htmlspecialchars($requestUrl, ENT_QUOTES, 'UTF-8') . '" '
       . 'data-summarize-text="' . htmlspecialchars($summarizeText, ENT_QUOTES, 'UTF-8') . '" '
       . 'data-loading-text="' . htmlspecialchars($loadingText, ENT_QUOTES, 'UTF-8') . '" '
       . 'data-error-text="' . htmlspecialchars($errorText, ENT_QUOTES, 'UTF-8') . '" '

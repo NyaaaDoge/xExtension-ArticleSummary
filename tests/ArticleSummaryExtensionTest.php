@@ -116,6 +116,22 @@ class ArticleSummaryExtensionTest extends TestCase
         $this->assertStringContainsString('全文约 8 字', $content);
     }
 
+    public function testAddSummaryButtonDoesNotDoubleEscapeRequestUrl(): void
+    {
+        \Minz_Url::$displayUrl = './?c=ArticleSummary&amp;a=summarize&amp;params%5Bid%5D=entry-1';
+        $extension = new \ArticleSummaryExtension();
+        $entry = new TestArticleSummaryEntry('entry-1', '<p>Hello</p>');
+
+        $result = $extension->addSummaryButton($entry);
+        $content = $result->content();
+
+        $this->assertStringContainsString(
+            'data-request="./?c=ArticleSummary&amp;a=summarize&amp;params%5Bid%5D=entry-1"',
+            $content
+        );
+        $this->assertStringNotContainsString('&amp;amp;', $content);
+    }
+
     public function testChineseSummaryButtonLabelIsAiSummary(): void
     {
         $translations = require __DIR__ . '/../i18n/zh-CN/ArticleSummary.php';

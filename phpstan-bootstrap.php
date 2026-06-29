@@ -101,8 +101,10 @@ if (!class_exists('Minz_Request')) {
 
 if (!class_exists('Minz_Url')) {
     class Minz_Url {
+        public static string $displayUrl = '';
+
         public static function display(array $params): string {
-            return '';
+            return self::$displayUrl;
         }
     }
 }
