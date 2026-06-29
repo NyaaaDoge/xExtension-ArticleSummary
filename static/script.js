@@ -85,7 +85,12 @@ function setOaiState(container, statusType, statusMsg, summaryText) {
  * @param {HTMLElement} target - The clicked button element
  */
 async function summarizeButtonClick(target) {
-  var container = target.parentNode;
+  var container = target.closest
+    ? target.closest('.oai-summary-wrap')
+    : findSummaryContainer(target);
+  if (!container) {
+    return;
+  }
   
   // Prevent multiple requests while loading
   // 加载时防止多次请求
@@ -154,6 +159,16 @@ async function summarizeButtonClick(target) {
                     'Request Failed';
     setOaiState(container, 2, errorMsg, null);
   }
+}
+
+function findSummaryContainer(target) {
+  for (var element = target; element; element = element.parentNode) {
+    if (element.matches && element.matches('.oai-summary-wrap')) {
+      return element;
+    }
+  }
+
+  return null;
 }
 
 /**
