@@ -16,7 +16,8 @@ return array(
         'summarize' => 'AI Summary'
     ),
     'meta' => array(
-        'word_count' => 'About %s characters'
+        'word_count' => 'About %s characters',
+        'reading_time' => '%s min read'
     ),
     'status' => array(
         'loading' => 'Loading...',

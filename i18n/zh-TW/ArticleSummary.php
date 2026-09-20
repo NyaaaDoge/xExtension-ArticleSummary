@@ -16,7 +16,8 @@ return array(
         'summarize' => 'AI總結'
     ),
     'meta' => array(
-        'word_count' => '全文約 %s 字'
+        'word_count' => '全文約 %s 字',
+        'reading_time' => '閱讀約 %s 分鐘'
     ),
     'status' => array(
         'loading' => '載入中...',

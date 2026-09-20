@@ -113,7 +113,31 @@ class ArticleSummaryExtensionTest extends TestCase
 
         $this->assertStringContainsString('class="oai-summary-header"', $content);
         $this->assertStringContainsString('class="oai-summary-meta"', $content);
+        // Hello + 世界 + ! = 8; spaces/NBSP are not counted
         $this->assertStringContainsString('全文约 8 字', $content);
+        $this->assertStringContainsString('阅读约 1 分钟', $content);
+        $this->assertStringContainsString('全文约 8 字 · 阅读约 1 分钟', $content);
+    }
+
+    public function testZeroWidthCharactersAreNotCounted(): void
+    {
+        $extension = new \ArticleSummaryExtension();
+        // U+200B ZWSP between characters must not count
+        $entry = new TestArticleSummaryEntry('entry-zwsp', '<p>测​试</p>');
+
+        $result = $extension->addSummaryButton($entry);
+
+        $this->assertStringContainsString('全文约 2 字 · 阅读约 1 分钟', $result->content());
+    }
+
+    public function testReadingTimeRoundsUpAtFourHundredCharacters(): void
+    {
+        $extension = new \ArticleSummaryExtension();
+        $entry = new TestArticleSummaryEntry('entry-401', '<p>' . str_repeat('字', 401) . '</p>');
+
+        $result = $extension->addSummaryButton($entry);
+
+        $this->assertStringContainsString('全文约 401 字 · 阅读约 2 分钟', $result->content());
     }
 
     public function testAddSummaryButtonDoesNotDoubleEscapeRequestUrl(): void

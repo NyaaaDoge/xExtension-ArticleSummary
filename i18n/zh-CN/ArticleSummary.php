@@ -16,7 +16,8 @@ return array(
         'summarize' => 'AI总结'
     ),
     'meta' => array(
-        'word_count' => '全文约 %s 字'
+        'word_count' => '全文约 %s 字',
+        'reading_time' => '阅读约 %s 分钟'
     ),
     'status' => array(
         'loading' => '加载中...',

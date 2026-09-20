@@ -24,22 +24,22 @@ final class ArticleSummaryExtension extends Minz_Extension
     // 注册钩子，为每篇文章添加总结按钮
     // 使用字符串方式以兼容旧版本 FreshRSS
     $this->registerHook('entry_before_display', [$this, 'addSummaryButton']);
-    
+
     // Register controller for handling summarization requests
     // 注册控制器以处理总结请求
     $this->registerController('ArticleSummary');
-    
+
     // Register translations
     // 注册翻译文件
     $this->registerTranslates(__DIR__ . '/i18n');
-    
+
     // Only set default prompt if not already set (null)
     // 仅当提示词尚未设置时（null）才设置默认值
     if (is_null(FreshRSS_Context::$user_conf->oai_prompt)) {
       FreshRSS_Context::$user_conf->oai_prompt = _t('ArticleSummary.config.default_prompt');
       FreshRSS_Context::$user_conf->save();
     }
-    
+
     // Append static resources
     // 附加静态资源
     Minz_View::appendStyle($this->getFileUrl('style.css', 'css'));
@@ -51,7 +51,7 @@ final class ArticleSummaryExtension extends Minz_Extension
   /**
    * Add summary button to article content
    * 向文章内容添加总结按钮
-   * 
+   *
    * @param FreshRSS_Entry $entry The article entry
    * @return FreshRSS_Entry Modified article entry with summary button
    */
@@ -62,7 +62,7 @@ final class ArticleSummaryExtension extends Minz_Extension
     if (Minz_Request::param('a') === 'rss') {
       return $entry; // Return original entry without modifying it for RSS
     }
-    
+
     // Generate URL for summarization request
     // 生成总结请求的URL
     $url_summary = Minz_Url::display(array(
@@ -74,7 +74,8 @@ final class ArticleSummaryExtension extends Minz_Extension
     ));
 
     $entryContent = $entry->content();
-    $wordCountText = $this->formatWordCount($this->countVisibleCharacters($entryContent));
+    $wordCount = $this->countVisibleCharacters($entryContent);
+    $wordCountText = $this->formatWordCount($wordCount) . ' · ' . $this->formatReadingTime($wordCount);
     $requestUrl = html_entity_decode($url_summary, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
     // Get translated texts
@@ -101,7 +102,7 @@ final class ArticleSummaryExtension extends Minz_Extension
       . '</div>'
       . $entryContent
     );
-    
+
     return $entry;
   }
 
@@ -114,7 +115,8 @@ final class ArticleSummaryExtension extends Minz_Extension
 
     $text = strip_tags($text);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $normalizedText = preg_replace('/\s+/u', '', trim($text));
+    // Drop ASCII/Unicode spaces (incl. NBSP, U+3000) and format chars (ZWSP, BOM, soft hyphen)
+    $normalizedText = preg_replace('/[\s\p{Z}\p{Cf}]+/u', '', trim($text));
     if (is_string($normalizedText)) {
       $text = $normalizedText;
     }
@@ -132,12 +134,22 @@ final class ArticleSummaryExtension extends Minz_Extension
 
   private function formatWordCount(int $wordCount): string
   {
-    $template = _t('ArticleSummary.meta.word_count');
-    if ($template === 'ArticleSummary.meta.word_count' || $template === '') {
-      $template = '全文约 %s 字';
-    }
+    return sprintf($this->metaTemplate('ArticleSummary.meta.word_count', '全文约 %s 字'), number_format($wordCount));
+  }
 
-    return sprintf($template, number_format($wordCount));
+  private function formatReadingTime(int $wordCount): string
+  {
+    $minutes = max(1, (int)ceil($wordCount / 400));
+    return sprintf($this->metaTemplate('ArticleSummary.meta.reading_time', '阅读约 %s 分钟'), $minutes);
+  }
+
+  private function metaTemplate(string $key, string $fallback): string
+  {
+    $template = _t($key);
+    if ($template === $key || $template === '') {
+      return $fallback;
+    }
+    return $template;
   }
 
   /**
@@ -153,13 +165,13 @@ final class ArticleSummaryExtension extends Minz_Extension
       $oai_model = Minz_Request::param('oai_model', '');
       $oai_prompt = Minz_Request::param('oai_prompt', '');
       $oai_provider = Minz_Request::param('oai_provider', '');
-      
+
       // If prompt is empty string, set to null so default can be applied
       // 如果提示词为空字符串，则设置为null以便应用默认值
       if (trim($oai_prompt) === '') {
         $oai_prompt = null;
       }
-      
+
       // Set the configuration values
       // 设置配置值
       FreshRSS_Context::$user_conf->oai_url = $oai_url;
@@ -167,7 +179,7 @@ final class ArticleSummaryExtension extends Minz_Extension
       FreshRSS_Context::$user_conf->oai_model = $oai_model;
       FreshRSS_Context::$user_conf->oai_prompt = $oai_prompt;
       FreshRSS_Context::$user_conf->oai_provider = $oai_provider;
-      
+
       // Save the configuration
       // 保存配置
       FreshRSS_Context::$user_conf->save();
